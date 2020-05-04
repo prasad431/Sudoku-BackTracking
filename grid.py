@@ -14,16 +14,16 @@ sudoku = attributes.random_board()
 
 class Grid:
     board = sudoku
-    def __init__(self, rows, cols, width, height, win):
-        self.rows = rows
-        self.cols = cols
-        self.cubes = [[Cube(self.board[i][j], i, j, width, height) for j in range(cols)] for i in range(rows)]
-        self.width = width
-        self.height = height
+    def __init__(self, r, c, w, h, window):
+        self.rows = r
+        self.cols = c
+        self.cubes = [[Cube(self.board[i][j], i, j, w, h) for j in range(c)] for i in range(r)]
+        self.width = w
+        self.height = h
         self.model = None
         self.update_model()
         self.selected = None
-        self.win = win
+        self.win = window
 
     def update_model(self):
         self.model = [[self.cubes[i][j].value for j in range(self.cols)] for i in range(self.rows)]
@@ -42,12 +42,12 @@ class Grid:
                 self.update_model()
                 return False
 
-    def sketch(self, val):
-        row, col = self.selected
-        self.cubes[row][col].set_temp(val)
+    def sketch(self, v):
+        r, c = self.selected
+        self.cubes[r][c].set_temp(v)
 
     def draw(self):
-        # Draw Grid Lines
+        # Grid Lines
         gap = self.width / 9
         for i in range(self.rows+1):
             if i % 3 == 0 and i != 0:
@@ -57,7 +57,7 @@ class Grid:
             pygame.draw.line(self.win, (0,0,0), (0, i*gap), (self.width, i*gap), thick)
             pygame.draw.line(self.win, (0, 0, 0), (i * gap, 0), (i * gap, self.height), thick)
 
-        # Draw Cubes
+        # Cubes
         for i in range(self.rows):
             for j in range(self.cols):
                 self.cubes[i][j].draw(self.win)
@@ -76,11 +76,11 @@ class Grid:
         if self.cubes[row][col].value == 0:
             self.cubes[row][col].set_temp(0)
 
+    """
+    :param: pos
+    :return: (row, col)
+    """
     def click(self, pos):
-        """
-        :param: pos
-        :return: (row, col)
-        """
         if pos[0] < self.width and pos[1] < self.height:
             gap = self.width / 9
             x = pos[0] // gap
@@ -115,17 +115,17 @@ class Grid:
         return False
 
     def solve_gui(self):
-        find = find_empty(self.model)
-        if not find:
+        f = find_empty(self.model)
+        if not f:
             return True
         else:
-            row, col = find
+            r, c = f
 
         for i in range(1, 10):
-            if valid(self.model, i, (row, col)):
-                self.model[row][col] = i
-                self.cubes[row][col].set(i)
-                self.cubes[row][col].draw_change(self.win, True)
+            if valid(self.model, i, (r, c)):
+                self.model[r][c] = i
+                self.cubes[r][c].set(i)
+                self.cubes[r][c].draw_change(self.win, True)
                 self.update_model()
                 pygame.display.update()
                 pygame.time.delay(100)
@@ -133,10 +133,10 @@ class Grid:
                 if self.solve_gui():
                     return True
 
-                self.model[row][col] = 0
-                self.cubes[row][col].set(0)
+                self.model[r][c] = 0
+                self.cubes[r][c].set(0)
                 self.update_model()
-                self.cubes[row][col].draw_change(self.win, False)
+                self.cubes[r][c].draw_change(self.win, False)
                 pygame.display.update()
                 pygame.time.delay(100)
 
