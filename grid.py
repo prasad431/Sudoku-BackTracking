@@ -1,6 +1,7 @@
 import pygame
 import time
 from random_attributes import Attributes
+from validator import *
 from Cube import *
 
 pygame.font.init()
